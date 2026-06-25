@@ -11,3 +11,5 @@ texts=[
 ]
 vector = embeddings.embed_documents(texts)
 print(vector)
+print(len(vector))
+print(len(vector(0)))
