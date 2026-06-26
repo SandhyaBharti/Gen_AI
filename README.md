@@ -8,7 +8,7 @@ Welcome to the **GenAI Playground & MovieSage AI** repository! This project serv
 
 ### 1. 🍿 MovieSage AI (`./MovieSageAI/`)
 An intelligent movie information extraction assistant. Given a raw textual description of a movie, MovieSage AI parses it, extracts structured metadata, generates a concise summary, and returns the result in clean JSON format.
-* **Core Logic (`./MovieSageAI/core.py`)**: Console-based JSON extraction using Mistral AI (`mistral-small-2603`).
+* **Core Logic (`./MovieSageAI/core.py`)**: Console-based structured extraction using Mistral AI (`mistral-small-2603`) and LangChain's `PydanticOutputParser`. It uses a detailed Pydantic schema (`MovieSageModel`) to parse raw text into clean, structured JSON containing fields such as genre, cast, director, plot summary, box office, rating, and keywords.
 * **Interactive UI (`./MovieSageAI/UIMovieSageBot.py`)**: A premium, highly styled Streamlit dashboard with a cinematic interface, custom dark mode styling, and dynamic scanning overlays.
 
 ### 2. 🎭 Personality Chatbot (`./chatmodel/`)
