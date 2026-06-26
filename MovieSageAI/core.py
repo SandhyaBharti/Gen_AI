@@ -9,10 +9,36 @@ from dotenv import load_dotenv
 load_dotenv()
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_mistralai import ChatMistralAI
+from langchain_core.output_parsers import PydanticOutputParser
+from pydantic import BaseModel
+from typing import List, Optional
 
 model = ChatMistralAI(model="mistral-small-2603")
 
 from langchain_core.prompts import ChatPromptTemplate
+
+class MovieSageModel(BaseModel):
+    title: str
+    genre: str
+    director: str
+    writers: str
+    producers: str
+    cast: str
+    release_year: str
+    runtime: str
+    language: str
+    country: str
+    plot_summary: str
+    main_characters: str
+    themes: str
+    notable_facts: str
+    awards: str
+    box_office: str
+    rating: str
+    keywords: Optional[List[str]] = None
+
+parser = PydanticOutputParser(pydantic_object=MovieSageModel)
+
 
 prompt = ChatPromptTemplate.from_messages(
     [
@@ -71,7 +97,12 @@ You are MovieSage AI, an expert movie analyst and information extraction assista
 )
 
 para = input("give your paragraph")
-final_prompt = prompt.invoke({"movie_description": para})
+final_prompt = prompt.invoke({
+    "movie_description": para, 
+    "format_instructions": parser.get_format_instructions()
+})
 
 res = model.invoke(final_prompt)
 print(res.content)
+
+# AI->JSON->Backend->API->Frontend
