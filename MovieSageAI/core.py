@@ -19,22 +19,22 @@ from langchain_core.prompts import ChatPromptTemplate
 
 class MovieSageModel(BaseModel):
     title: str
-    genre: str
-    director: str
-    writers: str
-    producers: str
-    cast: str
-    release_year: str
-    runtime: str
-    language: str
-    country: str
-    plot_summary: str
-    main_characters: str
-    themes: str
-    notable_facts: str
-    awards: str
-    box_office: str
-    rating: str
+    genre: Optional[str] = None
+    director: Optional[str] = None
+    writers: Optional[str] = None
+    producers: Optional[str] = None
+    cast: Optional[List[str]] = None
+    release_year: Optional[str] = None
+    runtime: Optional[str] = None
+    language: Optional[str] = None
+    country: Optional[str] = None
+    plot_summary: Optional[str] = ("description: there should be a summary of the movie and not just information in it. it should be intresting and easy to understand. it should not be too long or too short.")
+    main_characters: Optional[List[str]] = None
+    themes: Optional[List[str]] = None
+    notable_facts: Optional[List[str]] = None
+    awards: Optional[List[str]] = None
+    box_office: Optional[str] = None
+    rating: Optional[str] = None
     keywords: Optional[List[str]] = None
 
 parser = PydanticOutputParser(pydantic_object=MovieSageModel)
