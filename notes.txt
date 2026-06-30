@@ -1,0 +1,134 @@
+System Design :- At core system design is the process of defining 
+how diff part of software system interact to meet with functional 
+requirements(what it should do) and non-functional req(flow it should do).
+
+system design -> functional and non-functional 
+30 design concepts->    1. client-server architecture, 
+                        2. IP address,
+                        3. DNS,
+                        4. Proxy/Reverse Proxy,
+                        5. Latency,
+                        6. HTTPs/HTTPS,
+                        7. APIs,
+                        8. Rest API, 
+                        9. GraphQL,
+                        10. Databases,
+                        11. SQL vs NoSQL, 
+                        12. Vertical Scaling, 
+                        13. Horizontal Scaling, 
+                        14. Loaad Balancies, 
+                        15. Database Indexing, 
+                        16. Replication,
+                        17. Sharding,
+                        18. Vertical Partioning,
+                        19. Caching, 20 .Denormalization,
+                        21. CAP Theorem,
+                        22. Both Storage,
+                        23. CDN,
+                        24. WebSockets, 
+                        25. Microservices,
+                        26.  Message Queues, 
+                        27. Rate Limiting, 
+                        29. API Gateways, 
+                        30 Idempotency
+
+# monolithic and microlithic architecture  (part 1)
+# monolithic architecture -> everything is tightly coupled depended on each other 
+issue 1: single code base-> we will build + run + test + deploy together
+disadvantage:- single point failure-> if one file will crash then other will also get down 
+issue 2:- deployment bottleneck -> i have to add credit card feature in the payment gateway then after adding it again i have to  re deploy the whole project (issue ko deployemnt bottleneck issue bolte hain)
+issue 3 -> scaling :- i have multiple pages lots of users uses at the same time, so that i have to scale up the pages (each and every page) bcz it's a small website
+
+# Microservice architecture
+every module is losely coupled, they are not too much depended on each other
+we can build them individually + test + Deploy + 
+
+@monolithic
+s1[individually] -> s2[individually] -> s3[individually] 
+all are not dependent on each other 
+
+*shared database-> each collection under one database (table can be different but single database)
+
+@microlithic
+s1->s2->s3
+every service can have their own database 
+
+# converting a system from monolithic to Microservice
+1. not a one day task
+2. we do not migrate our whole project at once 
+3. we try to understand our project 
+* we do not transfer our whole traffic at once to micro 
+
+1. understand monolithic -> identify tify-high impact areas -> build API construct 
+
+# why we build API contracts-> an API is a clear agreement b/w services about: 
+-> request format (JSON str, params)
+-> response format
+-> endpoints + methods(GET,POST,etc) 
+-> err handling
+Ex:- GET users/:id
+{
+    "id" : 1,
+}
+
+* key point:- this ensures all servies talk in same language
+setup communication-> system becomes slow/unreliable 
+this is how services actually talk to each other
+(a) sync (real-time)
+->REST APIs (HTTP), Ex: order service -> call user service 
+(b) ***Async (event-based) 
+-> message queues like kafka or rabbitMQ
+-> ex: order placed -> event sent -> payment serive listens
+# in simple terms ->
+1. contracts -> rule of communication 
+2. communication -> how messages are sent
+
+we don't demolish while till the time shifte 100% traffic
+monolithic payment -> micro payment
+while shifting from mono to micro we don't shift directly we use "Traffic Canary"
+ method and by using it we shift small set of traffic first and if it works then we will shift the rest  
+
+# we use design pattern 
+The name is "Strangler Design Pattern"
+IN SDP we gradually replace a legacy system with new one -> without shuting everything down at once. 
+
+request -> SDP:-
+=>90%->old arch (shift 90% arch to old one)
+=>10%->new arch (shift 10% arch to new one)
+
+#Transaction: SAGA : the design pattern hanles transactions across multiple microservices without using single global DB transaction
+Core idea: instead of core big transaction, u break it into small local transaction If something fails:-> u undo previous step(compensation)
+2 types of SAGA:=> 
+(i) Choreography(event-based):- services talk via events (no central controller),
+                                    flow->order created->payment listens->payment success->inventory listens
+(ii) Orchestration(central control):- one service controls the flow(saga orchestration)
+                                        flow-> orchestratior->call order->then payment->then inventory
+
+# Data Consistancy (Outbox) :=> ex: 
+when a user place order, u need to do 2 things:- (i) save the order in database (ii) send the event -> "order created"(so that payment service can act)
+Problem(without outbox): what if:- 
+*order saved
+*event sending fails
+-> now ur system is broken(order is about no payment )
+
+with outbox pattern:-
+trusted of sending the event directly 
+step 1: save both in one db transaction, 
+        -> order -> order table
+        -> event -> outbox table
+{
+    "event": "order created",
+    "orderID": "123"
+}  
+
+
+Part 2: API Gateway vs load balancer
+# API gateway:- "API gateway is a single entry point for all the clients reqs in a system with multiple backend services."
+User => GATEWAY :- 
+    a. User
+    b. payment
+    c. order
+what does api gateway do? 
+=> a. routes req to the correct serivce
+b. handles auth and authorization
+c. perform rate Limiting 
